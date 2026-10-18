@@ -1,0 +1,90 @@
+
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Social Book</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f0f2f5;font-family:Arial,sans-serif;color:#1c1e21}
+header{background:#1877f2;color:white;padding:16px;font-size:24px;font-weight:bold;position:sticky;top:0}
+main{max-width:600px;margin:18px auto;padding:0 12px}
+.card{background:white;border-radius:12px;padding:16px;margin-bottom:16px;box-shadow:0 1px 4px #ccc}
+h2{margin-top:0;color:#1877f2}
+input,textarea,button{width:100%;padding:12px;margin:6px 0;border:1px solid #ccd0d5;border-radius:8px;font-size:16px}
+button{background:#1877f2;color:white;border:0;font-weight:bold}
+.post{border-top:1px solid #ddd;padding-top:12px;margin-top:12px;overflow-wrap:anywhere}
+.post img,.post video{width:100%;border-radius:8px;margin-top:8px}
+.filepreview{width:100%;height:300px;border:1px solid #ddd;border-radius:8px}
+small{color:#65676b}
+</style>
+</head>
+<body>
+<header>📘 Social Book</header>
+<main>
+<section class="card">
+<h2>স্বাগতম Social Book-এ!</h2>
+<p>তোমার পোস্ট শেয়ার করো এবং HTML ফাইলের প্রিভিউ দেখো।</p>
+</section>
+<section class="card">
+<h3>✍️ নতুন পোস্ট</h3>
+<input id="author" placeholder="তোমার নাম">
+<input id="title" placeholder="পোস্টের শিরোনাম">
+<textarea id="message" placeholder="কী শেয়ার করতে চাও?"></textarea>
+<label>ছবি বা ভিডিও নির্বাচন করো</label>
+<input id="media" type="file" accept="image/*,video/*">
+<label>HTML ফাইল নির্বাচন করো</label>
+<input id="htmlfile" type="file" accept=".html,.htm,text/html">
+<button onclick="publish()">পোস্ট প্রকাশ করো</button>
+<small>এটি প্রাথমিক ডেমো। আপাতত পোস্ট শুধু এই ব্রাউজারেই দেখা যাবে।</small>
+</section>
+<section class="card">
+<h3>📰 পোস্টসমূহ</h3>
+<div id="feed"><p>এখনো কোনো পোস্ট নেই।</p></div>
+</section>
+</main>
+<script>
+function publish(){
+const author=document.getElementById('author').value.trim()||'অতিথি';
+const title=document.getElementById('title').value.trim();
+const message=document.getElementById('message').value.trim();
+const media=document.getElementById('media').files[0];
+const html=document.getElementById('htmlfile').files[0];
+if(!title&&!message&&!media&&!html){alert('আগে পোস্টের তথ্য দাও।');return}
+const post=document.createElement('article');
+post.className='post';
+const name=document.createElement('strong');
+name.textContent=author;
+post.appendChild(name);
+if(title){const h=document.createElement('h3');h.textContent=title;post.appendChild(h)}
+if(message){const p=document.createElement('p');p.textContent=message;post.appendChild(p)}
+if(media){
+const url=URL.createObjectURL(media);
+let el;
+if(media.type.startsWith('image/')){el=document.createElement('img');el.alt='পোস্টের ছবি'}
+else{el=document.createElement('video');el.controls=true}
+el.src=url;post.appendChild(el);
+}
+if(html){
+const label=document.createElement('p');label.textContent='HTML ফাইল: '+html.name;post.appendChild(label);
+const frame=document.createElement('iframe');
+frame.className='filepreview';frame.title='HTML ফাইলের প্রিভিউ';
+frame.setAttribute('sandbox','');
+frame.srcdoc='<!DOCTYPE html><html><body style="font-family:Arial;padding:12px">ফাইলের প্রিভিউ প্রস্তুত হচ্ছে...</body></html>';
+post.appendChild(frame);
+const reader=new FileReader();
+reader.onload=()=>{frame.srcdoc=reader.result};
+reader.readAsText(html);
+}
+const feed=document.getElementById('feed');
+if(feed.querySelector('p')&&feed.children.length===1)feed.innerHTML='';
+feed.prepend(post);
+document.getElementById('title').value='';
+document.getElementById('message').value='';
+document.getElementById('media').value='';
+document.getElementById('htmlfile').value='';
+}
+</script>
+</body>
+</html>
